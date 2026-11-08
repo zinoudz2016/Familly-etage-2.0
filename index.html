@@ -1,0 +1,2079 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Famille Étage - Gestion & Tâches Partagées</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
+  <!-- Google Fonts: Inter & Roboto -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            },
+            maman: {
+              light: '#fdf2f8',
+              border: '#fbcfe8',
+              text: '#db2777',
+              bg: '#ec4899',
+            },
+            papa: {
+              light: '#eff6ff',
+              border: '#bfdbfe',
+              text: '#2563eb',
+              bg: '#3b82f6',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    .safe-bottom {
+      padding-bottom: env(safe-area-inset-bottom, 1rem);
+    }
+    .badge-papa {
+      background-color: #dbeafe;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+    }
+    .badge-maman {
+      background-color: #fce7f3;
+      color: #be185d;
+      border: 1px solid #fbcfe8;
+    }
+    .badge-duo {
+      background-color: #f3e8ff;
+      color: #7e22ce;
+      border: 1px solid #e9d5ff;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans antialiased h-full flex flex-col justify-center items-center p-0 md:p-4">
+
+  <!-- Main Device Simulator Container -->
+  <div id="deviceContainer" class="w-full max-w-md bg-white md:rounded-3xl md:shadow-2xl flex flex-col h-full md:h-[92vh] max-h-[920px] overflow-hidden relative border border-slate-200">
+
+    <!-- Android Status Bar Simulation -->
+    <div class="bg-slate-900 text-white text-xs px-5 py-1.5 flex justify-between items-center select-none z-30 font-medium">
+      <span id="androidClock">19:25</span>
+      <div class="flex items-center gap-2">
+        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L12 22l7.03-4.39C20.26 16.07 21 14.12 21 12c0-4.97-4.03-9-9-9z"/></svg>
+        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 4C7.31 4 3.07 5.9 0 8.98L12 21 24 8.98C20.93 5.9 16.69 4 12 4z"/></svg>
+        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </div>
+    </div>
+
+    <!-- ==================== SCREEN 1: GOOGLE AUTH LOGIN ==================== -->
+    <div id="authScreen" class="flex-1 flex flex-col justify-between p-6 bg-gradient-to-b from-indigo-50/50 via-white to-slate-50 overflow-y-auto">
+      <div class="pt-6 text-center">
+        <!-- Logo & Header -->
+        <div class="w-20 h-20 bg-gradient-to-tr from-indigo-600 to-indigo-400 rounded-3xl mx-auto flex items-center justify-center shadow-lg shadow-indigo-200 mb-4 transform transition-transform hover:scale-105">
+          <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+          </svg>
+        </div>
+        <span class="inline-block px-3 py-1 bg-indigo-100 text-indigo-700 font-semibold text-xs rounded-full mb-2 tracking-wide uppercase">Étage Familial</span>
+        <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">Famille Hub Pro</h1>
+        <p class="text-sm text-slate-500 mt-2 max-w-xs mx-auto">Organisation quotidienne, comptabilité mensuelle & liste des achats partagés entre Maman & Papa.</p>
+      </div>
+
+      <div class="my-6 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="flex items-center gap-3 mb-4 pb-3 border-b border-slate-100">
+          <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          </div>
+          <div>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Accès Sécurisé Obligatoire</h3>
+            <p class="text-xs text-slate-500">Un compte Google est requis pour accéder aux détails.</p>
+          </div>
+        </div>
+
+        <!-- Email Input Required Form -->
+        <form id="formEmailLogin" class="space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5 flex items-center justify-between">
+              <span>Saisissez votre compte Google :</span>
+              <span class="text-[10px] text-rose-500 font-bold">* Saisie requise</span>
+            </label>
+            <div class="relative">
+              <input id="inputLoginEmail" type="email" required autocomplete="email" placeholder="Adresse e-mail Google (ex: exemple@gmail.com)" class="w-full text-xs p-3 pl-9 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-slate-50/70 font-medium">
+              <svg class="w-4 h-4 text-slate-400 absolute left-3 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"/></svg>
+            </div>
+            <div id="loginErrorMessage" class="hidden mt-2 text-[11px] font-semibold text-rose-600 bg-rose-50 p-2.5 rounded-xl border border-rose-200 flex items-center gap-1.5">
+              <span>⚠️</span>
+              <span>Accès refusé, le mail n'est pas autorisé.</span>
+            </div>
+          </div>
+
+          <button id="btnSubmitLogin" type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs py-3 rounded-xl transition shadow-xs flex items-center justify-center gap-2">
+            <span>Déverrouiller et Accéder à l'Étage</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          </button>
+        </form>
+
+
+      </div>
+
+      <!-- Footer Info -->
+      <div class="text-center text-[11px] text-slate-400 pb-2">
+        <span>Synchronisation de l'étage • Protection des finances familiales</span>
+      </div>
+    </div>
+
+    <!-- ==================== SCREEN 2: MAIN APPLICATION DASHBOARD ==================== -->
+    <div id="appScreen" class="hidden flex-1 flex flex-col h-full overflow-hidden bg-slate-50">
+      
+      <!-- Top App Bar -->
+      <div class="bg-white border-b border-slate-200 px-4 py-3 flex justify-between items-center z-10 shadow-xs">
+        <div class="flex items-center gap-2.5">
+          <div id="currentUserAvatar" class="w-9 h-9 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-xs shadow-sm ring-2 ring-blue-100">
+            P
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <h2 id="currentUserName" class="text-xs font-bold text-slate-900">Papa</h2>
+              <span id="currentUserRoleBadge" class="text-[10px] px-1.5 py-0.5 rounded-md font-semibold bg-blue-100 text-blue-700">Compte Actif</span>
+            </div>
+            <div class="text-[10px] text-slate-500 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>Étage 2 • En ligne</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Switch Parent & Logout & Settings -->
+        <div class="flex items-center gap-1.5">
+          <button id="btnTopSettings" type="button" title="Paramètres de l'étage" class="p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-slate-100 rounded-lg transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          </button>
+          <button id="btnSwitchParent" type="button" title="Changer de parent" class="text-[11px] font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-1 rounded-lg border border-slate-200 transition flex items-center gap-1">
+            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+            <span id="switchParentLabel">Passer à Maman</span>
+          </button>
+          <button id="btnLogout" type="button" title="Se déconnecter" class="p-1.5 text-slate-400 hover:text-rose-600 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Scrollable Content Area -->
+      <div id="tabContentScroll" class="flex-1 overflow-y-auto p-4 space-y-4">
+        
+        <!-- ================= TAB 1: ACCUEIL / SYNTHÈSE ================= -->
+        <div id="viewAccueil" class="space-y-4">
+          <!-- Salutation Card -->
+          <div class="bg-gradient-to-r from-indigo-600 to-indigo-800 rounded-2xl p-4 text-white shadow-md relative overflow-hidden">
+            <div class="relative z-10">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-200">Tableau de bord de l'étage</span>
+              <h3 id="welcomeHeadline" class="text-lg font-bold mt-0.5">Bienvenue Papa ! 👋</h3>
+              <p class="text-xs text-indigo-100 mt-1">Voici la situation financière et les tâches prioritaires du foyer.</p>
+              
+              <div class="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-indigo-500/50">
+                <div class="bg-white/10 rounded-xl p-2.5 backdrop-blur-xs">
+                  <div class="text-[10px] text-indigo-200">Tâches en attente</div>
+                  <div id="statPendingTasks" class="text-base font-extrabold text-white">4 tâches</div>
+                </div>
+                <div class="bg-white/10 rounded-xl p-2.5 backdrop-blur-xs">
+                  <div class="text-[10px] text-indigo-200">Achats à faire</div>
+                  <div id="statPendingPurchases" class="text-base font-extrabold text-amber-300">5 articles</div>
+                </div>
+              </div>
+            </div>
+            <!-- Decorative circle -->
+            <div class="absolute -right-6 -bottom-6 w-28 h-28 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+          </div>
+
+          <!-- Quick Balance Card -->
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Trésorerie du Mois (Novembre)
+              </span>
+              <button id="btnQuickGoFinances" type="button" class="text-[11px] font-semibold text-indigo-600 hover:underline">Voir détails &rarr;</button>
+            </div>
+            
+            <div class="grid grid-cols-3 gap-2 text-center py-2 bg-slate-50 rounded-xl border border-slate-100">
+              <div>
+                <div class="text-[10px] text-slate-500 font-medium">Entrées</div>
+                <div id="homeTotalEntrees" class="text-xs font-bold text-emerald-600">+145 000 DA</div>
+              </div>
+              <div class="border-x border-slate-200">
+                <div class="text-[10px] text-slate-500 font-medium">Sorties</div>
+                <div id="homeTotalSorties" class="text-xs font-bold text-rose-600">-87 500 DA</div>
+              </div>
+              <div>
+                <div class="text-[10px] text-slate-500 font-medium">Reste / Épargne</div>
+                <div id="homeSolde" class="text-xs font-bold text-indigo-600">57 500 DA</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Urgent Priority Tasks Preview -->
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+            <div class="flex justify-between items-center mb-3">
+              <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                Tâches Prioritaires de la Maison
+              </h4>
+              <button id="btnQuickGoTasks" type="button" class="text-[11px] font-semibold text-indigo-600 hover:underline">Tout voir &rarr;</button>
+            </div>
+            <div id="homePriorityTasksList" class="space-y-2">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Quick Action Buttons -->
+          <div class="grid grid-cols-3 gap-2">
+            <button id="btnQuickAddTask" type="button" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white border border-slate-200 shadow-xs hover:border-indigo-400 transition text-center group">
+              <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-1 group-hover:scale-105 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              </div>
+              <span class="text-[11px] font-bold text-slate-700">Tâche</span>
+            </button>
+            <button id="btnQuickAddPurchase" type="button" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white border border-slate-200 shadow-xs hover:border-amber-400 transition text-center group">
+              <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-1 group-hover:scale-105 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+              </div>
+              <span class="text-[11px] font-bold text-slate-700">Achat</span>
+            </button>
+            <button id="btnQuickAddExpense" type="button" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white border border-slate-200 shadow-xs hover:border-emerald-400 transition text-center group">
+              <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-1 group-hover:scale-105 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+              </div>
+              <span class="text-[11px] font-bold text-slate-700">Dépense</span>
+            </button>
+          </div>
+
+          <!-- Quick Banner to Settings -->
+          <div class="bg-gradient-to-r from-slate-900 to-indigo-950 text-white p-3 rounded-2xl flex items-center justify-between shadow-xs cursor-pointer hover:opacity-95 transition" id="btnBannerGoSettings">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center text-sm">⚙️</div>
+              <div>
+                <div class="text-xs font-bold">Paramètres de l'étage</div>
+                <div class="text-[10px] text-slate-300">Modifier dates de naissance, ajouter enfant, thèmes</div>
+              </div>
+            </div>
+            <span class="text-xs text-indigo-300 font-bold">&rarr;</span>
+          </div>
+        </div>
+
+        <!-- ================= TAB 2: TÂCHES DE LA MAISON ================= -->
+        <div id="viewTaches" class="hidden space-y-3">
+          <div class="flex justify-between items-center">
+            <div>
+              <h3 class="text-sm font-extrabold text-slate-900">Tâches de la Maison</h3>
+              <p class="text-[11px] text-slate-500">Partagées entre Papa et Maman</p>
+            </div>
+            <button id="btnOpenModalNewTask" type="button" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-1.5 rounded-xl flex items-center gap-1 shadow-xs transition">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              <span>Ajouter</span>
+            </button>
+          </div>
+
+          <!-- Task Filters -->
+          <div class="flex gap-1.5 overflow-x-auto pb-1 text-[11px] font-semibold no-scrollbar">
+            <button class="task-filter-btn px-2.5 py-1 rounded-lg bg-indigo-600 text-white whitespace-nowrap" data-filter="all">Toutes</button>
+            <button class="task-filter-btn px-2.5 py-1 rounded-lg bg-white text-slate-600 border border-slate-200 whitespace-nowrap" data-filter="mine">Mes Tâches</button>
+            <button class="task-filter-btn px-2.5 py-1 rounded-lg bg-white text-slate-600 border border-slate-200 whitespace-nowrap" data-filter="Papa">Papa</button>
+            <button class="task-filter-btn px-2.5 py-1 rounded-lg bg-white text-slate-600 border border-slate-200 whitespace-nowrap" data-filter="Maman">Maman</button>
+            <button class="task-filter-btn px-2.5 py-1 rounded-lg bg-white text-slate-600 border border-slate-200 whitespace-nowrap" data-filter="done">Terminées</button>
+          </div>
+
+          <!-- Tasks List Container -->
+          <div id="tasksListContainer" class="space-y-2">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- ================= TAB 3: ACHATS & BESOINS (SOUS FORME DE TÂCHES) ================= -->
+        <div id="viewAchats" class="hidden space-y-3">
+          <div class="flex justify-between items-center">
+            <div>
+              <h3 class="text-sm font-extrabold text-slate-900">Liste des Achats</h3>
+              <p class="text-[11px] text-slate-500">Achats sous forme de tâches à faire</p>
+            </div>
+            <button id="btnOpenModalNewPurchase" type="button" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3 py-1.5 rounded-xl flex items-center gap-1 shadow-xs transition">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              <span>Ajouter Achat</span>
+            </button>
+          </div>
+
+          <!-- Purchase Summary Box -->
+          <div class="bg-amber-50/70 border border-amber-200/80 rounded-2xl p-3 flex justify-between items-center text-xs">
+            <div>
+              <span class="text-[10px] uppercase font-bold text-amber-800 tracking-wider">Budget Courses en Cours</span>
+              <div id="purchasesRemainingTotal" class="text-sm font-extrabold text-amber-900">Est. 14 200 DA</div>
+            </div>
+            <div class="text-right">
+              <span class="text-[10px] text-amber-700 font-medium">Articles restants</span>
+              <div id="purchasesCountBadge" class="text-xs font-bold text-amber-800">5 à acheter</div>
+            </div>
+          </div>
+
+          <!-- Purchase Filter Pills -->
+          <div class="flex gap-1.5 overflow-x-auto pb-1 text-[11px] font-semibold no-scrollbar">
+            <button class="purchase-filter-btn px-2.5 py-1 rounded-lg bg-amber-600 text-white whitespace-nowrap" data-filter="pending">À Acheter</button>
+            <button class="purchase-filter-btn px-2.5 py-1 rounded-lg bg-white text-slate-600 border border-slate-200 whitespace-nowrap" data-filter="all">Tous</button>
+            <button class="purchase-filter-btn px-2.5 py-1 rounded-lg bg-white text-slate-600 border border-slate-200 whitespace-nowrap" data-filter="Papa">Charge Papa</button>
+            <button class="purchase-filter-btn px-2.5 py-1 rounded-lg bg-white text-slate-600 border border-slate-200 whitespace-nowrap" data-filter="Maman">Charge Maman</button>
+            <button class="purchase-filter-btn px-2.5 py-1 rounded-lg bg-white text-slate-600 border border-slate-200 whitespace-nowrap" data-filter="done">Déjà Achetés</button>
+          </div>
+
+          <!-- Purchase Items List -->
+          <div id="purchasesListContainer" class="space-y-2">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- ================= TAB 4: COMPTABILITÉ & FINANCES ================= -->
+        <div id="viewFinances" class="hidden space-y-3">
+          <div class="flex justify-between items-center">
+            <div>
+              <h3 class="text-sm font-extrabold text-slate-900">Comptabilité Mensuelle</h3>
+              <p class="text-[11px] text-slate-500">Entrées, sorties et charges de l'étage</p>
+            </div>
+            <button id="btnOpenModalNewTransaction" type="button" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-1.5 rounded-xl flex items-center gap-1 shadow-xs transition">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              <span>Transaction</span>
+            </button>
+          </div>
+
+          <!-- Financial Health Breakdown -->
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-3">
+            <div class="flex justify-between items-baseline">
+              <span class="text-xs font-bold text-slate-700">Bilan Global de Novembre</span>
+              <span id="financeRateLabel" class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                Solde Positif (+57 500 DA)
+              </span>
+            </div>
+
+            <!-- Progress Bar of Budget Spent -->
+            <div>
+              <div class="flex justify-between text-[11px] text-slate-500 mb-1">
+                <span>Dépensé : <b id="barSpentText" class="text-slate-800">60%</b></span>
+                <span>Revenus : <b id="barIncomeText" class="text-slate-800">145 000 DA</b></span>
+              </div>
+              <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden border border-slate-200 flex">
+                <div id="budgetProgressBar" class="h-full bg-indigo-600 rounded-full transition-all duration-500" style="width: 60%"></div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 text-xs">
+              <div class="p-2.5 rounded-xl bg-emerald-50 border border-emerald-100">
+                <div class="text-[10px] text-emerald-700 font-semibold uppercase">Total Entrées</div>
+                <div id="financeTotalEntrees" class="text-sm font-extrabold text-emerald-800">+145 000 DA</div>
+                <div class="text-[10px] text-emerald-600">Salaires & allocations</div>
+              </div>
+              <div class="p-2.5 rounded-xl bg-rose-50 border border-rose-100">
+                <div class="text-[10px] text-rose-700 font-semibold uppercase">Total Sorties</div>
+                <div id="financeTotalSorties" class="text-sm font-extrabold text-rose-800">-87 500 DA</div>
+                <div class="text-[10px] text-rose-600">Charges, courses, enfants</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Visual Chart: Expenses Breakdown -->
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+            <h4 class="text-xs font-bold text-slate-800 mb-2">Répartition des Dépenses par Poste</h4>
+            <div class="relative h-48 w-full">
+              <canvas id="expensesChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Transactions List Header & Filters -->
+          <div class="space-y-2">
+            <div class="flex justify-between items-center">
+              <h4 class="text-xs font-bold text-slate-800">Historique des Opérations</h4>
+              <span id="transCountLabel" class="text-[10px] text-slate-400">8 opérations</span>
+            </div>
+
+            <!-- Transaction Filter Tabs -->
+            <div class="flex gap-1.5 overflow-x-auto pb-1 text-[11px] font-semibold no-scrollbar">
+              <button class="trans-filter-btn px-2.5 py-1 rounded-lg bg-indigo-600 text-white whitespace-nowrap" data-filter="all">Toutes</button>
+              <button class="trans-filter-btn px-2.5 py-1 rounded-lg bg-white text-slate-600 border border-slate-200 whitespace-nowrap" data-filter="sortie">Sorties</button>
+              <button class="trans-filter-btn px-2.5 py-1 rounded-lg bg-white text-slate-600 border border-slate-200 whitespace-nowrap" data-filter="entree">Entrées</button>
+            </div>
+
+            <!-- Transactions Container -->
+            <div id="transactionsListContainer" class="space-y-2">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= TAB 5: ENFANTS & BESOINS DU FOYER ================= -->
+        <div id="viewEnfants" class="hidden space-y-3">
+          <div class="flex justify-between items-center">
+            <div>
+              <h3 class="text-sm font-extrabold text-slate-900">Besoins des Enfants</h3>
+              <p class="text-[11px] text-slate-500">Organisation, école, santé & pointures</p>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button id="btnGoSettingsFromEnfants" type="button" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-2.5 py-1.5 rounded-xl border border-slate-200 flex items-center gap-1 shadow-xs transition" title="Gérer enfants">
+                <span>⚙️ Gérer</span>
+              </button>
+              <button id="btnOpenModalNewEnfantNeed" type="button" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-2.5 py-1.5 rounded-xl flex items-center gap-1 shadow-xs transition">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                <span>Nouveau Besoin</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Children Profiles Cards (Dynamic) -->
+          <div id="childrenProfilesCardsContainer" class="grid grid-cols-2 gap-2">
+            <!-- Populated via renderChildrenCards -->
+          </div>
+
+          <!-- Pending Child Specific Needs & Tasks -->
+          <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs">
+            <h4 class="text-xs font-bold text-slate-800 mb-2.5 flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+              Besoins Spécifiques & Tâches Enfants
+            </h4>
+            <div id="childrenNeedsListContainer" class="space-y-2">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= TAB 6: PARAMÈTRES (SETTINGS) ================= -->
+        <div id="viewParametres" class="hidden space-y-3.5">
+          <div class="flex justify-between items-center">
+            <div>
+              <h3 class="text-sm font-extrabold text-slate-900">Paramètres de l'Étage</h3>
+              <p class="text-[11px] text-slate-500">Thème, profils enfants & réinitialisations</p>
+            </div>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">Gestion</span>
+          </div>
+
+          <!-- Section A: Thème & Couleurs -->
+          <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs space-y-2.5">
+            <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4 4 4 0 014-4 4 4 0 014 4 4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+              Couleurs & Thème de l'Application
+            </h4>
+            <div class="flex items-center justify-between gap-2 pt-1">
+              <button type="button" class="btn-theme-swatch w-7 h-7 rounded-full bg-indigo-600 ring-2 ring-indigo-200 transition" data-theme="indigo" title="Indigo"></button>
+              <button type="button" class="btn-theme-swatch w-7 h-7 rounded-full bg-emerald-600 hover:ring-2 hover:ring-emerald-200 transition" data-theme="emerald" title="Émeraude"></button>
+              <button type="button" class="btn-theme-swatch w-7 h-7 rounded-full bg-rose-600 hover:ring-2 hover:ring-rose-200 transition" data-theme="rose" title="Rose"></button>
+              <button type="button" class="btn-theme-swatch w-7 h-7 rounded-full bg-sky-600 hover:ring-2 hover:ring-sky-200 transition" data-theme="sky" title="Bleu"></button>
+              <button type="button" class="btn-theme-swatch w-7 h-7 rounded-full bg-amber-600 hover:ring-2 hover:ring-amber-200 transition" data-theme="amber" title="Ambre"></button>
+              <button type="button" class="btn-theme-swatch w-7 h-7 rounded-full bg-purple-600 hover:ring-2 hover:ring-purple-200 transition" data-theme="purple" title="Violet"></button>
+            </div>
+            <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+              <span class="text-slate-600 font-medium">Mode Sombre / Nuit</span>
+              <button id="btnToggleDarkMode" type="button" class="px-2.5 py-1 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold border border-slate-200 hover:bg-slate-200 transition">
+                <span id="labelDarkMode">Mode Nuit 🌙</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Section B: Gestion des Enfants (Ajouter, modifier dates de naissance) -->
+          <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs space-y-2.5">
+            <div class="flex justify-between items-center">
+              <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                Enfants de la Famille
+              </h4>
+              <button id="btnOpenAddChildModal" type="button" class="text-[11px] bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-2 py-1 rounded-lg transition flex items-center gap-1">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                <span>Ajouter</span>
+              </button>
+            </div>
+            <div id="settingsChildrenList" class="space-y-2">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Section C: Réinitialisation des Listes & Données -->
+          <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs space-y-2.5">
+            <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              Réinitialisation des Listes & Données
+            </h4>
+            <div class="space-y-1.5 text-xs">
+              <div class="flex items-center justify-between p-2 rounded-xl bg-amber-50/70 border border-amber-100">
+                <div>
+                  <div class="font-bold text-amber-900 text-xs">Liste des Achats</div>
+                  <div class="text-[10px] text-amber-700">Vider ou effacer la liste des courses</div>
+                </div>
+                <button id="btnTriggerResetPurchases" type="button" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-2 py-1 rounded-lg text-[11px] transition">
+                  Vider
+                </button>
+              </div>
+
+              <div class="flex items-center justify-between p-2 rounded-xl bg-rose-50/70 border border-rose-100">
+                <div>
+                  <div class="font-bold text-rose-900 text-xs">Comptabilité & Finances</div>
+                  <div class="text-[10px] text-rose-700">Effacer l'historique des opérations</div>
+                </div>
+                <button id="btnTriggerResetFinances" type="button" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-2 py-1 rounded-lg text-[11px] transition">
+                  Effacer
+                </button>
+              </div>
+
+              <div class="flex items-center justify-between p-2 rounded-xl bg-indigo-50/70 border border-indigo-100">
+                <div>
+                  <div class="font-bold text-indigo-900 text-xs">Tâches de la Maison</div>
+                  <div class="text-[10px] text-indigo-700">Effacer les tâches partagées</div>
+                </div>
+                <button id="btnTriggerResetTasks" type="button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-2 py-1 rounded-lg text-[11px] transition">
+                  Effacer
+                </button>
+              </div>
+
+              <div class="flex items-center justify-between p-2 rounded-xl bg-slate-100 border border-slate-200">
+                <div>
+                  <div class="font-bold text-slate-800 text-xs">Restaurer Tout par Défaut</div>
+                  <div class="text-[10px] text-slate-500">Recharger la configuration initiale</div>
+                </div>
+                <button id="btnTriggerResetAll" type="button" class="bg-slate-700 hover:bg-slate-800 text-white font-bold px-2 py-1 rounded-lg text-[11px] transition">
+                  Restaurer
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section D: Comptes Autorisés Uniques -->
+          <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs space-y-1.5 text-xs">
+            <h4 class="font-bold text-slate-800">🔒 Comptes Autorisés Uniques</h4>
+            <div class="p-2 rounded-xl bg-slate-50 border border-slate-100 flex justify-between items-center text-[11px]">
+              <span>👨 <b>Papa Zineddine</b></span>
+              <span class="font-mono text-blue-700">paralgan500@gmail.com</span>
+            </div>
+            <div class="p-2 rounded-xl bg-slate-50 border border-slate-100 flex justify-between items-center text-[11px]">
+              <span>👩 <b>Maman Alaa</b></span>
+              <span class="font-mono text-pink-700">dr.bouhicha@gmail.com</span>
+            </div>
+          </div>
+        </div></div>
+
+      </div>
+
+      <!-- Android Bottom Navigation Bar -->
+      <div class="bg-white border-t border-slate-200 px-2 py-2 flex justify-around items-center safe-bottom z-20 shadow-lg">
+        <button class="nav-tab-btn flex flex-col items-center gap-1 p-1 text-indigo-600 transition" data-target="viewAccueil">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
+          <span class="text-[10px] font-bold">Accueil</span>
+        </button>
+
+        <button class="nav-tab-btn flex flex-col items-center gap-1 p-1 text-slate-400 hover:text-slate-600 transition" data-target="viewTaches">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+          <span class="text-[10px] font-bold">Tâches</span>
+        </button>
+
+        <button class="nav-tab-btn flex flex-col items-center gap-1 p-1 text-slate-400 hover:text-slate-600 transition" data-target="viewAchats">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+          <span class="text-[10px] font-bold">Achats</span>
+        </button>
+
+        <button class="nav-tab-btn flex flex-col items-center gap-1 p-1 text-slate-400 hover:text-slate-600 transition" data-target="viewFinances">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span class="text-[10px] font-bold">Finances</span>
+        </button>
+
+        <button class="nav-tab-btn flex flex-col items-center gap-1 p-1 text-slate-400 hover:text-slate-600 transition" data-target="viewEnfants">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+          <span class="text-[10px] font-bold">Enfants</span>
+        </button>
+
+        <button class="nav-tab-btn flex flex-col items-center gap-1 p-1 text-slate-400 hover:text-slate-600 transition" data-target="viewParametres">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          <span class="text-[10px] font-bold">Paramètres</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ==================== MODALS ==================== -->
+
+    <!-- Modal 1: Nouvelle Tâche -->
+    <div id="modalTask" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl w-full max-w-sm p-5 shadow-2xl border border-slate-100 overflow-hidden transform transition-all">
+        <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+          <h3 class="text-sm font-bold text-slate-900">Nouvelle Tâche Maison</h3>
+          <button id="btnCloseModalTask" type="button" class="text-slate-400 hover:text-slate-600 p-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <form id="formAddTask" class="mt-3 space-y-3">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">Titre de la tâche</label>
+            <input id="taskInputTitle" type="text" required placeholder="Ex: Réparer prise chambre, Nettoyer balcon..." class="w-full text-xs p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-1">Qui s'en charge ?</label>
+              <select id="taskInputAssignee" class="w-full text-xs p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 bg-white">
+                <option value="Papa">Papa</option>
+                <option value="Maman">Maman</option>
+                <option value="Duo">Les Deux (Famille)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-1">Priorité</label>
+              <select id="taskInputPriority" class="w-full text-xs p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 bg-white">
+                <option value="Moyenne">Moyenne</option>
+                <option value="Haute">Haute (Urgent)</option>
+                <option value="Basse">Basse</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">Catégorie</label>
+            <select id="taskInputCategory" class="w-full text-xs p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 bg-white">
+              <option value="Maison & Entretien">Maison & Entretien</option>
+              <option value="Enfants & École">Enfants & École</option>
+              <option value="Administratif & Factures">Administratif & Factures</option>
+              <option value="Santé">Santé & Médecin</option>
+              <option value="Autre">Autre</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">Date d'échéance</label>
+            <input id="taskInputDate" type="date" class="w-full text-xs p-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 bg-white">
+          </div>
+          <div class="pt-2 flex gap-2">
+            <button id="btnCancelTask" type="button" class="flex-1 py-2 text-xs font-semibold rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Annuler</button>
+            <button type="submit" class="flex-1 py-2 text-xs font-bold rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition">Enregistrer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal 2: Nouvel Achat (Tâche d'achat) -->
+    <div id="modalPurchase" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl w-full max-w-sm p-5 shadow-2xl border border-slate-100 overflow-hidden transform transition-all">
+        <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+          <h3 class="text-sm font-bold text-slate-900">Ajouter un Achat à faire</h3>
+          <button id="btnCloseModalPurchase" type="button" class="text-slate-400 hover:text-slate-600 p-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <form id="formAddPurchase" class="mt-3 space-y-3">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">Article ou Produit</label>
+            <input id="purchaseInputTitle" type="text" required placeholder="Ex: Couches Taline, Lait, Fruits & Légumes..." class="w-full text-xs p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:outline-none">
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-1">Montant estimé (DA)</label>
+              <input id="purchaseInputPrice" type="number" required placeholder="Ex: 2500" class="w-full text-xs p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-1">Assigné à</label>
+              <select id="purchaseInputAssignee" class="w-full text-xs p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 bg-white">
+                <option value="Papa">Papa</option>
+                <option value="Maman">Maman</option>
+                <option value="Duo">Indifférent</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">Rayon / Type</label>
+            <select id="purchaseInputCategory" class="w-full text-xs p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 bg-white">
+              <option value="Supermarché & Nourriture">Supermarché & Nourriture</option>
+              <option value="Bébé & Enfants">Bébé & Enfants</option>
+              <option value="Pharmacie & Soins">Pharmacie & Soins</option>
+              <option value="Maison & Bricolage">Maison & Bricolage</option>
+              <option value="Autre">Autre</option>
+            </select>
+          </div>
+          <div class="pt-2 flex gap-2">
+            <button id="btnCancelPurchase" type="button" class="flex-1 py-2 text-xs font-semibold rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Annuler</button>
+            <button type="submit" class="flex-1 py-2 text-xs font-bold rounded-xl bg-amber-600 text-white hover:bg-amber-700 transition">Ajouter aux courses</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal 3: Nouvelle Transaction Comptable -->
+    <div id="modalTransaction" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl w-full max-w-sm p-5 shadow-2xl border border-slate-100 overflow-hidden transform transition-all">
+        <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+          <h3 class="text-sm font-bold text-slate-900">Enregistrer une Opération</h3>
+          <button id="btnCloseModalTrans" type="button" class="text-slate-400 hover:text-slate-600 p-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <form id="formAddTransaction" class="mt-3 space-y-3">
+          <!-- Type Toggle: Sortie vs Entree -->
+          <div class="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-xl">
+            <label class="cursor-pointer">
+              <input type="radio" name="transType" value="sortie" checked class="peer sr-only">
+              <div class="text-center py-2 text-xs font-bold rounded-lg text-slate-600 peer-checked:bg-rose-600 peer-checked:text-white transition">
+                Sortie (Dépense)
+              </div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="transType" value="entree" class="peer sr-only">
+              <div class="text-center py-2 text-xs font-bold rounded-lg text-slate-600 peer-checked:bg-emerald-600 peer-checked:text-white transition">
+                Entrée (Revenu)
+              </div>
+            </label>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">Description</label>
+            <input id="transInputTitle" type="text" required placeholder="Ex: Facture Gaz/Électricité, Salaire..." class="w-full text-xs p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-1">Montant (DA)</label>
+              <input id="transInputAmount" type="number" required placeholder="Ex: 8500" class="w-full text-xs p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-1">Payé par / Reçu par</label>
+              <select id="transInputPayer" class="w-full text-xs p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 bg-white">
+                <option value="Papa">Papa</option>
+                <option value="Maman">Maman</option>
+                <option value="Compte Commun">Compte Étage Commun</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">Poste de dépense</label>
+            <select id="transInputCategory" class="w-full text-xs p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 bg-white">
+              <option value="Charges Étage (Loyer, Eau, Gaz, Elec)">Charges Étage (Loyer, Électricité, Gaz, Internet)</option>
+              <option value="Alimentation & Courses">Alimentation & Courses</option>
+              <option value="Enfants (École, Vêtements, Crèche)">Enfants (École, Vêtements, Crèche)</option>
+              <option value="Santé & Pharmacie">Santé & Pharmacie</option>
+              <option value="Entretien & Travaux">Entretien & Travaux Étage</option>
+              <option value="Salaire & Revenus">Salaire & Revenus</option>
+              <option value="Autre">Autre Dépense</option>
+            </select>
+          </div>
+          <div class="pt-2 flex gap-2">
+            <button id="btnCancelTrans" type="button" class="flex-1 py-2 text-xs font-semibold rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Annuler</button>
+            <button type="submit" class="flex-1 py-2 text-xs font-bold rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition">Enregistrer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal 4: Gérer un Enfant (Ajouter / Modifier) -->
+    <div id="modalChild" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl w-full max-w-sm p-5 shadow-2xl border border-slate-100 overflow-hidden transform transition-all">
+        <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+          <h3 id="modalChildTitle" class="text-sm font-bold text-slate-900">Ajouter un Enfant</h3>
+          <button id="btnCloseModalChild" type="button" class="text-slate-400 hover:text-slate-600 p-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <form id="formChild" class="mt-3 space-y-3">
+          <input id="childEditId" type="hidden" value="">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">Prénom de l'enfant</label>
+            <input id="childInputName" type="text" required placeholder="Ex: Larine, Taline, Rayan..." class="w-full text-xs p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-1">Date de naissance</label>
+              <input id="childInputBirthDate" type="date" required class="w-full text-xs p-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 bg-white">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-1">Âge calculé</label>
+              <input id="childInputAge" type="number" min="0" max="25" placeholder="Ex: 8" class="w-full text-xs p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 bg-slate-50">
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-1">Pointure chaussures</label>
+              <input id="childInputShoe" type="text" placeholder="Ex: 32" class="w-full text-xs p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-1">Taille vêtements</label>
+              <input id="childInputClothes" type="text" placeholder="Ex: 8-10 ans" class="w-full text-xs p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+            </div>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">Scolarité / Activités</label>
+            <input id="childInputSchool" type="text" placeholder="Ex: Primaire 3ème AP, Judo, Danse..." class="w-full text-xs p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+          <div class="pt-2 flex gap-2">
+            <button id="btnCancelChild" type="button" class="flex-1 py-2 text-xs font-semibold rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Annuler</button>
+            <button type="submit" class="flex-1 py-2 text-xs font-bold rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition">Enregistrer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal 5: Confirmation Réinitialisation -->
+    <div id="modalConfirmReset" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl w-full max-w-xs p-5 shadow-2xl border border-slate-100 text-center">
+        <div class="w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mx-auto mb-3 text-xl font-bold">⚠️</div>
+        <h3 id="resetConfirmTitle" class="text-sm font-bold text-slate-900">Confirmation</h3>
+        <p id="resetConfirmDesc" class="text-xs text-slate-500 mt-1 mb-4">Êtes-vous sûr de vouloir réinitialiser ces données ?</p>
+        <div class="flex gap-2">
+          <button id="btnCancelResetAction" type="button" class="flex-1 py-2 text-xs font-semibold rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Annuler</button>
+          <button id="btnProceedResetAction" type="button" class="flex-1 py-2 text-xs font-bold rounded-xl bg-rose-600 text-white hover:bg-rose-700 transition">Réinitialiser</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toastNotification" class="hidden fixed top-10 left-1/2 transform -translate-x-1/2 z-50 bg-slate-900 text-white text-xs font-semibold px-4 py-2.5 rounded-2xl shadow-xl flex items-center gap-2 transition-all">
+      <span id="toastIcon">✨</span>
+      <span id="toastMessage">Action enregistrée !</span>
+    </div>
+
+  </div>
+
+  <!-- APPLICATION LOGIC & JAVASCRIPT -->
+  <script>
+    // Initial Seed Data (State)
+    const DEFAULT_DATA = {
+      currentUser: null,
+      themeColor: "indigo",
+      darkMode: false,
+      children: [
+        { id: 1, name: "Larine", birthDate: "2018-05-14", age: 8, shoeSize: "32", clothingSize: "8-10 ans", schoolLevel: "Primaire 3ème AP", sport: "Gymnastique & Natation" },
+        { id: 2, name: "Taline", birthDate: "2023-09-20", age: 3, shoeSize: "24", clothingSize: "3-4 ans", schoolLevel: "Maternelle / Crèche", sport: "Éveil & Motricité" }
+      ],
+      tasks: [
+        { id: 1, title: "Payer facture SONELGAZ (Électricité/Gaz)", assignee: "Papa", priority: "Haute", category: "Administratif & Factures", date: "2026-11-10", completed: false },
+        { id: 2, title: "Prendre RDV pédiatre pour vaccin Taline", assignee: "Maman", priority: "Haute", category: "Santé", date: "2026-11-12", completed: false },
+        { id: 3, title: "Réparer poignée porte balcon étage", assignee: "Papa", priority: "Moyenne", category: "Maison & Entretien", date: "2026-11-15", completed: false },
+        { id: 4, title: "Aider Larine projet sciences école", assignee: "Maman", priority: "Moyenne", category: "Enfants & École", date: "2026-11-09", completed: true },
+        { id: 5, title: "Nettoyage grand tapis salon étage", assignee: "Duo", priority: "Basse", category: "Maison & Entretien", date: "2026-11-14", completed: false }
+      ],
+      purchases: [
+        { id: 101, title: "Pack couches Taline taille 4", price: 2800, assignee: "Papa", category: "Bébé & Enfants", completed: false },
+        { id: 102, title: "Courses semaine (Légumes, Viande, Lait)", price: 7500, assignee: "Papa", category: "Supermarché & Nourriture", completed: false },
+        { id: 103, title: "Chaussures sport Larine (Pointure 32)", price: 4200, assignee: "Maman", category: "Bébé & Enfants", completed: false },
+        { id: 104, title: "Lessive liquide & adoucissant maison", price: 1600, assignee: "Maman", category: "Maison & Bricolage", completed: true },
+        { id: 105, title: "Sirop toux & vitamines pharmacie", price: 1100, assignee: "Maman", category: "Pharmacie & Soins", completed: false }
+      ],
+      transactions: [
+        { id: 201, title: "Virement Salaire Papa", amount: 110000, type: "entree", payer: "Papa", category: "Salaire & Revenus", date: "2026-11-02" },
+        { id: 202, title: "Activité Freelance / Complément Maman", amount: 35000, type: "entree", payer: "Maman", category: "Salaire & Revenus", date: "2026-11-05" },
+        { id: 203, title: "Loyer & charges de l'étage", amount: 40000, type: "sortie", payer: "Papa", category: "Charges Étage (Loyer, Eau, Gaz, Elec)", date: "2026-11-03" },
+        { id: 204, title: "Facture Internet Fibre & Abonnements", amount: 4500, type: "sortie", payer: "Papa", category: "Charges Étage (Loyer, Eau, Gaz, Elec)", date: "2026-11-04" },
+        { id: 205, title: "Grandes courses Alimentation supermarché", amount: 28000, type: "sortie", payer: "Papa", category: "Alimentation & Courses", date: "2026-11-04" },
+        { id: 206, title: "Frais cantine et école Larine", amount: 8000, type: "sortie", payer: "Maman", category: "Enfants (École, Vêtements, Crèche)", date: "2026-11-06" },
+        { id: 207, title: "Pharmacie & vitamines enfants", amount: 3000, type: "sortie", payer: "Maman", category: "Santé & Pharmacie", date: "2026-11-06" },
+        { id: 208, title: "Petits travaux éclairage LED étage", amount: 4000, type: "sortie", payer: "Papa", category: "Entretien & Travaux", date: "2026-11-07" }
+      ],
+      childrenNeeds: [
+        { id: 301, child: "Larine", title: "Cahier de dessin et feutres pour l'école", priority: "Moyenne", completed: false },
+        { id: 302, child: "Larine", title: "Fournitures et tenue de sport Larine", priority: "Basse", completed: true },
+        { id: 303, child: "Taline", title: "Visite contrôle pédiatre 3 ans", priority: "Haute", completed: false },
+        { id: 304, child: "Taline", title: "Achat bottes de pluie taille 24", priority: "Moyenne", completed: false }
+      ]
+    };
+
+    // State Manager with LocalStorage fallback
+    let AppState = { ...DEFAULT_DATA };
+
+    function loadState() {
+      try {
+        const saved = localStorage.getItem("famille_etage_hub_data");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          AppState = { ...DEFAULT_DATA, ...parsed };
+          if (!AppState.children || AppState.children.length === 0) {
+            AppState.children = [...DEFAULT_DATA.children];
+          }
+          if (!AppState.themeColor) AppState.themeColor = "indigo";
+          if (AppState.currentUser) {
+            if (AppState.currentUser.role === "Papa") {
+              AppState.currentUser.name = "Papa (Zineddine)";
+              AppState.currentUser.email = "paralgan500@gmail.com";
+            } else if (AppState.currentUser.role === "Maman") {
+              AppState.currentUser.name = "Maman (Alaa)";
+              AppState.currentUser.email = "dr.bouhicha@gmail.com";
+            }
+          }
+        }
+      } catch (e) {
+        console.warn("Storage access restricted, using in-memory state");
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem("famille_etage_hub_data", JSON.stringify(AppState));
+      } catch (e) {
+        console.warn("Could not write to storage");
+      }
+    }
+
+    // Toast Utility
+    function showToast(msg, icon = "✅") {
+      const toast = document.getElementById("toastNotification");
+      const text = document.getElementById("toastMessage");
+      const ico = document.getElementById("toastIcon");
+      if (!toast || !text) return;
+      text.textContent = msg;
+      if (ico) ico.textContent = icon;
+      toast.classList.remove("hidden");
+      setTimeout(() => {
+        toast.classList.add("hidden");
+      }, 2500);
+    }
+
+    // Chart Instance Variable
+    let expensesChartInstance = null;
+
+    // Clock update
+    function updateClock() {
+      const clockEl = document.getElementById("androidClock");
+      if (!clockEl) return;
+      const now = new Date();
+      clockEl.textContent = now.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+    }
+    setInterval(updateClock, 10000);
+    updateClock();
+
+    // DOM Elements
+    const authScreen = document.getElementById("authScreen");
+    const appScreen = document.getElementById("appScreen");
+    const currentUserNameEl = document.getElementById("currentUserName");
+    const currentUserRoleBadge = document.getElementById("currentUserRoleBadge");
+    const currentUserAvatar = document.getElementById("currentUserAvatar");
+    const welcomeHeadline = document.getElementById("welcomeHeadline");
+    const switchParentLabel = document.getElementById("switchParentLabel");
+
+    // Login Flow
+    function performLogin(userObj) {
+      AppState.currentUser = userObj;
+      saveState();
+      authScreen.classList.add("hidden");
+      appScreen.classList.remove("hidden");
+      updateUserUI();
+      renderAll();
+      showToast(`Connecté avec succès : ${userObj.name} (${userObj.email})`, "🔑");
+    }
+
+    function performLogout() {
+      AppState.currentUser = null;
+      saveState();
+      appScreen.classList.add("hidden");
+      authScreen.classList.remove("hidden");
+      showToast("Déconnexion réussie", "👋");
+    }
+
+    function switchParent() {
+      if (!AppState.currentUser) return;
+      if (AppState.currentUser.role === "Papa") {
+        AppState.currentUser = {
+          name: "Maman (Alaa)",
+          email: "dr.bouhicha@gmail.com",
+          role: "Maman"
+        };
+      } else {
+        AppState.currentUser = {
+          name: "Papa (Zineddine)",
+          email: "paralgan500@gmail.com",
+          role: "Papa"
+        };
+      }
+      saveState();
+      updateUserUI();
+      renderAll();
+      showToast(`Profil actif : ${AppState.currentUser.name}`, "🔄");
+    }
+
+    function updateUserUI() {
+      if (!AppState.currentUser) return;
+      const u = AppState.currentUser;
+      currentUserNameEl.textContent = u.name;
+      welcomeHeadline.textContent = `Bienvenue ${u.role} ! 👋`;
+      
+      if (u.role === "Papa") {
+        currentUserAvatar.textContent = "P";
+        currentUserAvatar.className = "w-9 h-9 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-xs shadow-sm ring-2 ring-blue-100";
+        currentUserRoleBadge.textContent = "Papa";
+        currentUserRoleBadge.className = "text-[10px] px-1.5 py-0.5 rounded-md font-semibold bg-blue-100 text-blue-700";
+        switchParentLabel.textContent = "Passer à Maman";
+      } else {
+        currentUserAvatar.textContent = "M";
+        currentUserAvatar.className = "w-9 h-9 rounded-full bg-pink-600 text-white font-bold flex items-center justify-center text-xs shadow-sm ring-2 ring-pink-100";
+        currentUserRoleBadge.textContent = "Maman";
+        currentUserRoleBadge.className = "text-[10px] px-1.5 py-0.5 rounded-md font-semibold bg-pink-100 text-pink-700";
+        switchParentLabel.textContent = "Passer à Papa";
+      }
+    }
+
+    // Navigation Tabs logic
+    const navButtons = document.querySelectorAll(".nav-tab-btn");
+    const views = [
+      document.getElementById("viewAccueil"),
+      document.getElementById("viewTaches"),
+      document.getElementById("viewAchats"),
+      document.getElementById("viewFinances"),
+      document.getElementById("viewEnfants"),
+      document.getElementById("viewParametres")
+    ];
+
+    function switchTab(targetId) {
+      views.forEach(v => {
+        if (v.id === targetId) {
+          v.classList.remove("hidden");
+        } else {
+          v.classList.add("hidden");
+        }
+      });
+
+      navButtons.forEach(btn => {
+        if (btn.dataset.target === targetId) {
+          btn.classList.add("text-indigo-600");
+          btn.classList.remove("text-slate-400");
+        } else {
+          btn.classList.remove("text-indigo-600");
+          btn.classList.add("text-slate-400");
+        }
+      });
+
+      if (targetId === "viewFinances") {
+        setTimeout(initExpensesChart, 100);
+      }
+    }
+
+    navButtons.forEach(btn => {
+      btn.addEventListener("click", () => switchTab(btn.dataset.target));
+    });
+
+    document.getElementById("btnQuickGoTasks").addEventListener("click", () => switchTab("viewTaches"));
+    document.getElementById("btnQuickGoFinances").addEventListener("click", () => switchTab("viewFinances"));
+
+    // Filter states
+    let currentTaskFilter = "all";
+    let currentPurchaseFilter = "pending";
+    let currentTransFilter = "all";
+
+    // Format currency (Dinars algériens)
+    function formatMoney(amount) {
+      return Number(amount).toLocaleString("fr-FR") + " DA";
+    }
+
+    // RENDER FUNCTIONS
+    function renderOverview() {
+      // Pending counts
+      const pendingTasks = AppState.tasks.filter(t => !t.completed).length;
+      const pendingPurchases = AppState.purchases.filter(p => !p.completed).length;
+      
+      document.getElementById("statPendingTasks").textContent = `${pendingTasks} tâche${pendingTasks > 1 ? 's' : ''}`;
+      document.getElementById("statPendingPurchases").textContent = `${pendingPurchases} article${pendingPurchases > 1 ? 's' : ''}`;
+
+      // Finances summary
+      let totalEntrees = 0;
+      let totalSorties = 0;
+      AppState.transactions.forEach(t => {
+        if (t.type === "entree") totalEntrees += Number(t.amount);
+        else totalSorties += Number(t.amount);
+      });
+      const solde = totalEntrees - totalSorties;
+
+      document.getElementById("homeTotalEntrees").textContent = "+" + formatMoney(totalEntrees);
+      document.getElementById("homeTotalSorties").textContent = "-" + formatMoney(totalSorties);
+      const homeSoldeEl = document.getElementById("homeSolde");
+      homeSoldeEl.textContent = formatMoney(solde);
+      if (solde >= 0) {
+        homeSoldeEl.className = "text-xs font-bold text-indigo-600";
+      } else {
+        homeSoldeEl.className = "text-xs font-bold text-rose-600";
+      }
+
+      // Priority Tasks preview (Top 3)
+      const priorityContainer = document.getElementById("homePriorityTasksList");
+      priorityContainer.innerHTML = "";
+      const topTasks = AppState.tasks.filter(t => !t.completed).slice(0, 3);
+      
+      if (topTasks.length === 0) {
+        priorityContainer.innerHTML = `<div class="text-xs text-emerald-600 p-2 text-center bg-emerald-50 rounded-xl">Toutes les tâches prioritaires sont terminées ! 🎉</div>`;
+      } else {
+        topTasks.forEach(task => {
+          const item = document.createElement("div");
+          item.className = "flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-100 hover:border-slate-200 transition";
+          
+          let badgeClass = "badge-duo";
+          if (task.assignee === "Papa") badgeClass = "badge-papa";
+          if (task.assignee === "Maman") badgeClass = "badge-maman";
+
+          item.innerHTML = `
+            <div class="flex items-center gap-2.5 flex-1 min-w-0">
+              <input type="checkbox" data-task-id="${task.id}" class="task-checkbox-toggle w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer">
+              <div class="truncate">
+                <div class="text-xs font-bold text-slate-800 truncate">${task.title}</div>
+                <div class="text-[10px] text-slate-500">${task.category} • ${task.date || 'Pas de date'}</div>
+              </div>
+            </div>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-md ml-2 shrink-0 ${badgeClass}">${task.assignee}</span>
+          `;
+          priorityContainer.appendChild(item);
+        });
+      }
+    }
+
+    function renderTasks() {
+      const container = document.getElementById("tasksListContainer");
+      container.innerHTML = "";
+
+      const currentRole = AppState.currentUser ? AppState.currentUser.role : "Papa";
+
+      let filtered = AppState.tasks.filter(t => {
+        if (currentTaskFilter === "done") return t.completed;
+        if (currentTaskFilter === "mine") return !t.completed && (t.assignee === currentRole || t.assignee === "Duo");
+        if (currentTaskFilter === "Papa") return !t.completed && (t.assignee === "Papa" || t.assignee === "Duo");
+        if (currentTaskFilter === "Maman") return !t.completed && (t.assignee === "Maman" || t.assignee === "Duo");
+        return true; // all
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="p-6 text-center bg-white rounded-2xl border border-slate-200">
+            <div class="text-2xl mb-1">📋</div>
+            <div class="text-xs font-bold text-slate-700">Aucune tâche trouvée</div>
+            <div class="text-[11px] text-slate-400 mt-0.5">Ajoutez une tâche ou changez de filtre.</div>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(task => {
+        const card = document.createElement("div");
+        card.className = `p-3 rounded-2xl border transition flex items-start justify-between gap-3 ${task.completed ? 'bg-slate-50 border-slate-200 opacity-60' : 'bg-white border-slate-200 shadow-xs'}`;
+        
+        let badgeClass = "badge-duo";
+        if (task.assignee === "Papa") badgeClass = "badge-papa";
+        if (task.assignee === "Maman") badgeClass = "badge-maman";
+
+        let prioColor = "bg-slate-100 text-slate-600";
+        if (task.priority === "Haute") prioColor = "bg-rose-100 text-rose-700";
+        if (task.priority === "Moyenne") prioColor = "bg-amber-100 text-amber-700";
+
+        card.innerHTML = `
+          <div class="flex items-start gap-2.5 flex-1 min-w-0">
+            <input type="checkbox" data-task-id="${task.id}" ${task.completed ? 'checked' : ''} class="task-checkbox-toggle mt-0.5 w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer">
+            <div class="min-w-0 flex-1">
+              <div class="text-xs font-bold text-slate-800 ${task.completed ? 'line-through text-slate-400' : ''}">${task.title}</div>
+              <div class="flex flex-wrap items-center gap-1.5 mt-1">
+                <span class="text-[10px] px-1.5 py-0.5 rounded-md font-semibold ${badgeClass}">Assigné : ${task.assignee}</span>
+                <span class="text-[10px] px-1.5 py-0.5 rounded-md font-semibold ${prioColor}">${task.priority}</span>
+                <span class="text-[10px] text-slate-400">📅 ${task.date || 'À planifier'}</span>
+              </div>
+            </div>
+          </div>
+          <button data-delete-task-id="${task.id}" type="button" class="btn-delete-task text-slate-300 hover:text-rose-600 p-1 transition" title="Supprimer">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          </button>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderPurchases() {
+      const container = document.getElementById("purchasesListContainer");
+      container.innerHTML = "";
+
+      let remainingTotal = 0;
+      let pendingCount = 0;
+
+      AppState.purchases.forEach(p => {
+        if (!p.completed) {
+          remainingTotal += Number(p.price);
+          pendingCount++;
+        }
+      });
+
+      document.getElementById("purchasesRemainingTotal").textContent = "Est. " + formatMoney(remainingTotal);
+      document.getElementById("purchasesCountBadge").textContent = `${pendingCount} à acheter`;
+
+      let filtered = AppState.purchases.filter(p => {
+        if (currentPurchaseFilter === "pending") return !p.completed;
+        if (currentPurchaseFilter === "done") return p.completed;
+        if (currentPurchaseFilter === "Papa") return p.assignee === "Papa" || p.assignee === "Duo";
+        if (currentPurchaseFilter === "Maman") return p.assignee === "Maman" || p.assignee === "Duo";
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="p-6 text-center bg-white rounded-2xl border border-slate-200">
+            <div class="text-2xl mb-1">🛒</div>
+            <div class="text-xs font-bold text-slate-700">Aucun achat dans cette catégorie</div>
+            <div class="text-[11px] text-slate-400 mt-0.5">Le réfrigérateur et les placards sont tranquilles !</div>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(purchase => {
+        const card = document.createElement("div");
+        card.className = `p-3 rounded-2xl border transition flex items-center justify-between gap-3 ${purchase.completed ? 'bg-slate-50 border-slate-200 opacity-60' : 'bg-white border-slate-200 shadow-xs'}`;
+
+        let badgeClass = "badge-duo";
+        if (purchase.assignee === "Papa") badgeClass = "badge-papa";
+        if (purchase.assignee === "Maman") badgeClass = "badge-maman";
+
+        card.innerHTML = `
+          <div class="flex items-center gap-2.5 flex-1 min-w-0">
+            <input type="checkbox" data-purchase-id="${purchase.id}" ${purchase.completed ? 'checked' : ''} class="purchase-checkbox-toggle w-4 h-4 text-amber-600 rounded border-slate-300 focus:ring-amber-500 cursor-pointer">
+            <div class="min-w-0 flex-1">
+              <div class="text-xs font-bold text-slate-800 ${purchase.completed ? 'line-through text-slate-400' : ''}">${purchase.title}</div>
+              <div class="flex items-center gap-2 mt-0.5">
+                <span class="text-[10px] text-slate-500">${purchase.category}</span>
+                <span class="text-[10px] font-bold px-1.5 py-0.2 rounded ${badgeClass}">${purchase.assignee}</span>
+              </div>
+            </div>
+          </div>
+          <div class="text-right shrink-0">
+            <div class="text-xs font-extrabold ${purchase.completed ? 'text-slate-400' : 'text-amber-800'}">${formatMoney(purchase.price)}</div>
+            <button data-delete-purchase-id="${purchase.id}" type="button" class="btn-delete-purchase text-[10px] text-slate-300 hover:text-rose-600 transition">Supprimer</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderFinances() {
+      let totalEntrees = 0;
+      let totalSorties = 0;
+
+      const categoryTotals = {};
+
+      AppState.transactions.forEach(t => {
+        const amt = Number(t.amount);
+        if (t.type === "entree") {
+          totalEntrees += amt;
+        } else {
+          totalSorties += amt;
+          categoryTotals[t.category] = (categoryTotals[t.category] || 0) + amt;
+        }
+      });
+
+      const solde = totalEntrees - totalSorties;
+
+      document.getElementById("financeTotalEntrees").textContent = "+" + formatMoney(totalEntrees);
+      document.getElementById("financeTotalSorties").textContent = "-" + formatMoney(totalSorties);
+
+      const rateLabel = document.getElementById("financeRateLabel");
+      if (solde >= 0) {
+        rateLabel.textContent = `Solde Positif (+${formatMoney(solde)})`;
+        rateLabel.className = "text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200";
+      } else {
+        rateLabel.textContent = `Déficit (-${formatMoney(Math.abs(solde))})`;
+        rateLabel.className = "text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200";
+      }
+
+      // Budget progress
+      const percentSpent = totalEntrees > 0 ? Math.min(100, Math.round((totalSorties / totalEntrees) * 100)) : 100;
+      document.getElementById("barSpentText").textContent = percentSpent + "%";
+      document.getElementById("barIncomeText").textContent = formatMoney(totalEntrees);
+      const bar = document.getElementById("budgetProgressBar");
+      bar.style.width = percentSpent + "%";
+      if (percentSpent > 85) bar.className = "h-full bg-rose-500 rounded-full transition-all";
+      else if (percentSpent > 65) bar.className = "h-full bg-amber-500 rounded-full transition-all";
+      else bar.className = "h-full bg-indigo-600 rounded-full transition-all";
+
+      // Render Transactions
+      const container = document.getElementById("transactionsListContainer");
+      container.innerHTML = "";
+
+      let filtered = AppState.transactions.filter(t => {
+        if (currentTransFilter === "sortie") return t.type === "sortie";
+        if (currentTransFilter === "entree") return t.type === "entree";
+        return true;
+      });
+
+      document.getElementById("transCountLabel").textContent = `${filtered.length} opération${filtered.length > 1 ? 's' : ''}`;
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="p-4 text-center text-xs text-slate-400 bg-white rounded-xl">Aucune opération enregistrée.</div>`;
+        return;
+      }
+
+      // Sort by date desc
+      filtered.sort((a,b) => (b.date || "").localeCompare(a.date || ""));
+
+      filtered.forEach(t => {
+        const card = document.createElement("div");
+        card.className = "p-3 bg-white rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between";
+
+        const isEntree = t.type === "entree";
+        card.innerHTML = `
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold ${isEntree ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}">
+              ${isEntree ? '↓' : '↑'}
+            </div>
+            <div>
+              <div class="text-xs font-bold text-slate-800">${t.title}</div>
+              <div class="text-[10px] text-slate-400">${t.category} • Par ${t.payer} • ${t.date}</div>
+            </div>
+          </div>
+          <div class="text-right">
+            <div class="text-xs font-extrabold ${isEntree ? 'text-emerald-600' : 'text-slate-800'}">
+              ${isEntree ? '+' : '-'}${formatMoney(t.amount)}
+            </div>
+            <button data-delete-trans-id="${t.id}" type="button" class="btn-delete-trans text-[10px] text-slate-300 hover:text-rose-600 transition">Supprimer</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function initExpensesChart() {
+      const canvas = document.getElementById("expensesChart");
+      if (!canvas) return;
+
+      const categoryTotals = {};
+      AppState.transactions.forEach(t => {
+        if (t.type === "sortie") {
+          const cat = t.category.split("(")[0].trim();
+          categoryTotals[cat] = (categoryTotals[cat] || 0) + Number(t.amount);
+        }
+      });
+
+      const labels = Object.keys(categoryTotals);
+      const data = Object.values(categoryTotals);
+
+      if (labels.length === 0) {
+        labels.push("Aucune dépense");
+        data.push(1);
+      }
+
+      if (expensesChartInstance) {
+        expensesChartInstance.destroy();
+      }
+
+      expensesChartInstance = new Chart(canvas, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: data,
+            backgroundColor: [
+              '#4f46e5', // indigo
+              '#ec4899', // pink
+              '#f59e0b', // amber
+              '#10b981', // emerald
+              '#3b82f6', // blue
+              '#8b5cf6'  // purple
+            ],
+            borderWidth: 2,
+            borderColor: '#ffffff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: {
+                boxWidth: 10,
+                font: { size: 10, family: '"Plus Jakarta Sans"' }
+              }
+            }
+          },
+          cutout: '65%'
+        }
+      });
+    }
+
+    function renderChildrenNeeds() {
+      const container = document.getElementById("childrenNeedsListContainer");
+      container.innerHTML = "";
+
+      AppState.childrenNeeds.forEach(need => {
+        const item = document.createElement("div");
+        item.className = `p-2.5 rounded-xl border flex items-center justify-between gap-2 ${need.completed ? 'bg-slate-50 border-slate-200 opacity-60' : 'bg-slate-50/70 border-slate-200'}`;
+        
+        const childBadge = need.child === "Larine" ? 'bg-purple-100 text-purple-700' : 'bg-pink-100 text-pink-700';
+
+        item.innerHTML = `
+          <div class="flex items-center gap-2 flex-1 min-w-0">
+            <input type="checkbox" data-child-need-id="${need.id}" ${need.completed ? 'checked' : ''} class="child-need-checkbox w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer">
+            <div class="truncate">
+              <span class="text-[10px] font-bold px-1.5 py-0.2 rounded-md ${childBadge}">${need.child}</span>
+              <span class="text-xs font-semibold text-slate-800 ml-1 ${need.completed ? 'line-through text-slate-400' : ''}">${need.title}</span>
+            </div>
+          </div>
+          <button data-delete-child-need-id="${need.id}" type="button" class="btn-delete-child-need text-slate-300 hover:text-rose-600 p-1 transition" title="Supprimer">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          </button>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+
+    // Age calculator utility
+    function calculateAgeFromBirthDate(birthStr) {
+      if (!birthStr) return 0;
+      const birth = new Date(birthStr);
+      const today = new Date();
+      let age = today.getFullYear() - birth.getFullYear();
+      const m = today.getMonth() - birth.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+        age--;
+      }
+      return age >= 0 ? age : 0;
+    }
+
+    // Children Cards Rendering in viewEnfants
+    function renderChildrenCards() {
+      const container = document.getElementById("childrenProfilesCardsContainer");
+      if (!container) return;
+      container.innerHTML = "";
+
+      if (!AppState.children || AppState.children.length === 0) {
+        container.innerHTML = `<div class="col-span-2 p-3 text-center text-xs text-slate-400 bg-white rounded-xl">Aucun profil enfant. Ajoutez-en un dans les Paramètres !</div>`;
+        return;
+      }
+
+      AppState.children.forEach(child => {
+        const card = document.createElement("div");
+        card.className = "bg-white p-3 rounded-2xl border border-slate-200 shadow-xs";
+        const initial = child.name ? child.name.charAt(0).toUpperCase() : "E";
+        card.innerHTML = `
+          <div class="flex items-center gap-2 mb-2">
+            <div class="w-7 h-7 rounded-full bg-purple-100 text-purple-700 font-bold flex items-center justify-center text-xs">${initial}</div>
+            <div>
+              <h4 class="text-xs font-bold text-slate-800">${child.name} (${child.age} ans)</h4>
+              <span class="text-[10px] text-slate-500">${child.schoolLevel || 'Enfant'}</span>
+            </div>
+          </div>
+          <div class="space-y-1 text-[11px] text-slate-600 bg-slate-50 p-2 rounded-xl border border-slate-100">
+            <div class="flex justify-between"><span>Pointure :</span> <b class="text-slate-800">${child.shoeSize || '-'}</b></div>
+            <div class="flex justify-between"><span>Vêtements :</span> <b class="text-slate-800">${child.clothingSize || '-'}</b></div>
+            <div class="flex justify-between"><span>Né(e) le :</span> <b class="text-slate-700">${child.birthDate || '-'}</b></div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Children Management in Settings
+    function renderSettingsChildren() {
+      const container = document.getElementById("settingsChildrenList");
+      if (!container) return;
+      container.innerHTML = "";
+
+      AppState.children.forEach(child => {
+        const card = document.createElement("div");
+        card.className = "p-2.5 rounded-xl border border-slate-200 bg-slate-50/70 flex items-center justify-between text-xs";
+        card.innerHTML = `
+          <div>
+            <div class="font-bold text-slate-800">${child.name} (${child.age} ans)</div>
+            <div class="text-[10px] text-slate-500">Né(e) : ${child.birthDate} • Pointure : ${child.shoeSize} • Habits : ${child.clothingSize}</div>
+          </div>
+          <div class="flex items-center gap-1">
+            <button data-edit-child-id="${child.id}" type="button" class="btn-edit-child text-indigo-600 hover:bg-indigo-50 p-1 rounded transition" title="Modifier">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+            </button>
+            <button data-delete-child-id="${child.id}" type="button" class="btn-delete-child text-rose-500 hover:bg-rose-50 p-1 rounded transition" title="Supprimer">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Theme switching logic
+    const THEME_MAP = {
+      indigo: { name: "Indigo", primary: "#4f46e5", light: "#eef2ff" },
+      emerald: { name: "Émeraude", primary: "#059669", light: "#ecfdf5" },
+      rose: { name: "Rose", primary: "#e11d48", light: "#fff1f2" },
+      sky: { name: "Bleu", primary: "#0284c7", light: "#f0f9ff" },
+      amber: { name: "Ambre", primary: "#d97706", light: "#fffbeb" },
+      purple: { name: "Violet", primary: "#7c3aed", light: "#faf5ff" }
+    };
+
+    const THEME_STYLES = {
+      indigo: { primary: "#4f46e5", gradientFrom: "#4f46e5", gradientTo: "#3730a3", lightBg: "#eef2ff", ring: "#c7d2fe" },
+      emerald: { primary: "#059669", gradientFrom: "#059669", gradientTo: "#047857", lightBg: "#ecfdf5", ring: "#a7f3d0" },
+      rose: { primary: "#e11d48", gradientFrom: "#e11d48", gradientTo: "#be123c", lightBg: "#fff1f2", ring: "#fecdd3" },
+      sky: { primary: "#0284c7", gradientFrom: "#0284c7", gradientTo: "#0369a1", lightBg: "#f0f9ff", ring: "#bae6fd" },
+      amber: { primary: "#d97706", gradientFrom: "#d97706", gradientTo: "#b45309", lightBg: "#fffbeb", ring: "#fde68a" },
+      purple: { primary: "#7c3aed", gradientFrom: "#7c3aed", gradientTo: "#6d28d9", lightBg: "#faf5ff", ring: "#ddd6fe" }
+    };
+
+    function applyTheme(colorKey) {
+      if (!THEME_MAP[colorKey]) colorKey = "indigo";
+      AppState.themeColor = colorKey;
+      saveState();
+
+      const conf = THEME_STYLES[colorKey] || THEME_STYLES.indigo;
+      let dynStyle = document.getElementById("dynamicThemeStyle");
+      if (!dynStyle) {
+        dynStyle = document.createElement("style");
+        dynStyle.id = "dynamicThemeStyle";
+        document.head.appendChild(dynStyle);
+      }
+      dynStyle.textContent = `
+        .bg-indigo-600 { background-color: ${conf.primary} !important; }
+        .text-indigo-600 { color: ${conf.primary} !important; }
+        .from-indigo-600 { --tw-gradient-from: ${conf.gradientFrom} !important; }
+        .to-indigo-800 { --tw-gradient-to: ${conf.gradientTo} !important; }
+        .border-indigo-600 { border-color: ${conf.primary} !important; }
+        .bg-indigo-50 { background-color: ${conf.lightBg} !important; }
+        .ring-indigo-500:focus { --tw-ring-color: ${conf.primary} !important; }
+      `;
+
+      document.querySelectorAll(".btn-theme-swatch").forEach(btn => {
+        if (btn.dataset.theme === colorKey) {
+          btn.classList.add("ring-2", "ring-slate-500", "scale-110");
+        } else {
+          btn.classList.remove("ring-2", "ring-slate-500", "scale-110");
+        }
+      });
+      showToast(`Couleurs du thème : ${THEME_MAP[colorKey].name}`, "🎨");
+    }
+
+    // Dark Mode Toggle
+    function toggleDarkMode() {
+      AppState.darkMode = !AppState.darkMode;
+      saveState();
+      updateDarkModeUI();
+    }
+
+    function updateDarkModeUI() {
+      const container = document.getElementById("deviceContainer");
+      const label = document.getElementById("labelDarkMode");
+      if (AppState.darkMode) {
+        container.classList.add("dark");
+        if (label) label.textContent = "Mode Jour ☀️";
+      } else {
+        container.classList.remove("dark");
+        if (label) label.textContent = "Mode Nuit 🌙";
+      }
+    }
+
+    // Reset modals and state handlers
+    let pendingResetAction = null;
+
+    function openResetConfirmation(type, title, desc) {
+      pendingResetAction = type;
+      document.getElementById("resetConfirmTitle").textContent = title;
+      document.getElementById("resetConfirmDesc").textContent = desc;
+      document.getElementById("modalConfirmReset").classList.remove("hidden");
+    }
+
+    function executeResetAction() {
+      if (!pendingResetAction) return;
+      if (pendingResetAction === "purchases") {
+        AppState.purchases = [];
+        showToast("Liste des achats réinitialisée !", "🛒");
+      } else if (pendingResetAction === "finances") {
+        AppState.transactions = [];
+        showToast("Comptabilité réinitialisée !", "💰");
+      } else if (pendingResetAction === "tasks") {
+        AppState.tasks = [];
+        showToast("Tâches réinitialisées !", "📋");
+      } else if (pendingResetAction === "all") {
+        AppState = JSON.parse(JSON.stringify(DEFAULT_DATA));
+        AppState.currentUser = {
+          name: "Papa (Zineddine)",
+          email: "paralgan500@gmail.com",
+          role: "Papa"
+        };
+        showToast("Toutes les données ont été réinitialisées !", "🔄");
+      }
+      saveState();
+      renderAll();
+      initExpensesChart();
+      document.getElementById("modalConfirmReset").classList.add("hidden");
+      pendingResetAction = null;
+    }
+
+    function renderAll() {
+      renderOverview();
+      renderTasks();
+      renderPurchases();
+      renderFinances();
+      renderChildrenNeeds();
+      renderChildrenCards();
+      renderSettingsChildren();
+    }
+
+    // EVENT LISTENERS & DELEGATION
+
+    // Email Authentication Handler (Strict input validation)
+    const formEmailLogin = document.getElementById("formEmailLogin");
+    const inputLoginEmail = document.getElementById("inputLoginEmail");
+    const loginErrorMessage = document.getElementById("loginErrorMessage");
+
+    function validateAndLogin(emailTyped) {
+      const email = (emailTyped || "").trim().toLowerCase();
+      loginErrorMessage.classList.add("hidden");
+
+      if (email === "paralgan500@gmail.com") {
+        performLogin({
+          name: "Papa (Zineddine)",
+          email: "paralgan500@gmail.com",
+          role: "Papa"
+        });
+      } else if (email === "dr.bouhicha@gmail.com") {
+        performLogin({
+          name: "Maman (Alaa)",
+          email: "dr.bouhicha@gmail.com",
+          role: "Maman"
+        });
+      } else {
+        loginErrorMessage.classList.remove("hidden");
+        showToast("Accès refusé, le mail n'est pas autorisé.", "🚫");
+      }
+    }
+
+    formEmailLogin.addEventListener("submit", (e) => {
+      e.preventDefault();
+      validateAndLogin(inputLoginEmail.value);
+    });
+
+// Quick helper chips removed as requested by user
+
+// Custom login removed - Only Zineddine and Alaa authorized
+
+    document.getElementById("btnLogout").addEventListener("click", performLogout);
+    document.getElementById("btnSwitchParent").addEventListener("click", switchParent);
+
+    // Filter Buttons logic
+    document.querySelectorAll(".task-filter-btn").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        document.querySelectorAll(".task-filter-btn").forEach(b => {
+          b.className = "task-filter-btn px-2.5 py-1 rounded-lg bg-white text-slate-600 border border-slate-200 whitespace-nowrap";
+        });
+        e.target.className = "task-filter-btn px-2.5 py-1 rounded-lg bg-indigo-600 text-white whitespace-nowrap";
+        currentTaskFilter = e.target.dataset.filter;
+        renderTasks();
+      });
+    });
+
+    document.querySelectorAll(".purchase-filter-btn").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        document.querySelectorAll(".purchase-filter-btn").forEach(b => {
+          b.className = "purchase-filter-btn px-2.5 py-1 rounded-lg bg-white text-slate-600 border border-slate-200 whitespace-nowrap";
+        });
+        e.target.className = "purchase-filter-btn px-2.5 py-1 rounded-lg bg-amber-600 text-white whitespace-nowrap";
+        currentPurchaseFilter = e.target.dataset.filter;
+        renderPurchases();
+      });
+    });
+
+    document.querySelectorAll(".trans-filter-btn").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        document.querySelectorAll(".trans-filter-btn").forEach(b => {
+          b.className = "trans-filter-btn px-2.5 py-1 rounded-lg bg-white text-slate-600 border border-slate-200 whitespace-nowrap";
+        });
+        e.target.className = "trans-filter-btn px-2.5 py-1 rounded-lg bg-indigo-600 text-white whitespace-nowrap";
+        currentTransFilter = e.target.dataset.filter;
+        renderFinances();
+      });
+    });
+
+    // Checkbox and Delete Delegation
+    document.addEventListener("change", (e) => {
+      // Task checkbox
+      if (e.target.classList.contains("task-checkbox-toggle")) {
+        const id = Number(e.target.dataset.taskId);
+        const task = AppState.tasks.find(t => t.id === id);
+        if (task) {
+          task.completed = e.target.checked;
+          saveState();
+          renderAll();
+          showToast(task.completed ? "Tâche terminée ! Bravo 👏" : "Tâche réouverte", "✅");
+        }
+      }
+
+      // Purchase checkbox
+      if (e.target.classList.contains("purchase-checkbox-toggle")) {
+        const id = Number(e.target.dataset.purchaseId);
+        const purchase = AppState.purchases.find(p => p.id === id);
+        if (purchase) {
+          purchase.completed = e.target.checked;
+          
+          // If completed, automatically record corresponding expense if desired!
+          if (purchase.completed) {
+            AppState.transactions.push({
+              id: Date.now(),
+              title: `Achat : ${purchase.title}`,
+              amount: purchase.price,
+              type: "sortie",
+              payer: AppState.currentUser ? AppState.currentUser.role : purchase.assignee,
+              category: "Alimentation & Courses",
+              date: new Date().toISOString().split("T")[0]
+            });
+            showToast(`Acheté ! Dépense de ${formatMoney(purchase.price)} enregistrée dans les finances.`, "🛒");
+          } else {
+            showToast("Achat remis dans la liste à faire", "🔄");
+          }
+          saveState();
+          renderAll();
+        }
+      }
+
+      // Child need checkbox
+      if (e.target.classList.contains("child-need-checkbox")) {
+        const id = Number(e.target.dataset.childNeedId);
+        const item = AppState.childrenNeeds.find(n => n.id === id);
+        if (item) {
+          item.completed = e.target.checked;
+          saveState();
+          renderChildrenNeeds();
+          showToast(item.completed ? "Besoin enfant complété !" : "Besoin réactivé", "🧸");
+        }
+      }
+    });
+
+    document.addEventListener("click", (e) => {
+      // Delete Task
+      const btnDelTask = e.target.closest(".btn-delete-task");
+      if (btnDelTask) {
+        const id = Number(btnDelTask.dataset.deleteTaskId);
+        AppState.tasks = AppState.tasks.filter(t => t.id !== id);
+        saveState();
+        renderAll();
+        showToast("Tâche supprimée", "🗑️");
+      }
+
+      // Delete Purchase
+      const btnDelPurchase = e.target.closest(".btn-delete-purchase");
+      if (btnDelPurchase) {
+        const id = Number(btnDelPurchase.dataset.deletePurchaseId);
+        AppState.purchases = AppState.purchases.filter(p => p.id !== id);
+        saveState();
+        renderAll();
+        showToast("Achat retiré", "🗑️");
+      }
+
+      // Delete Transaction
+      const btnDelTrans = e.target.closest(".btn-delete-trans");
+      if (btnDelTrans) {
+        const id = Number(btnDelTrans.dataset.deleteTransId);
+        AppState.transactions = AppState.transactions.filter(t => t.id !== id);
+        saveState();
+        renderAll();
+        initExpensesChart();
+        showToast("Opération supprimée", "🗑️");
+      }
+
+      // Delete Child Need
+      const btnDelChildNeed = e.target.closest(".btn-delete-child-need");
+      if (btnDelChildNeed) {
+        const id = Number(btnDelChildNeed.dataset.deleteChildNeedId);
+        AppState.childrenNeeds = AppState.childrenNeeds.filter(n => n.id !== id);
+        saveState();
+        renderChildrenNeeds();
+        showToast("Besoin retiré", "🗑️");
+      }
+    });
+
+    // Modal Control: Tasks
+    const modalTask = document.getElementById("modalTask");
+    const openModalTask = () => modalTask.classList.remove("hidden");
+    const closeModalTask = () => modalTask.classList.add("hidden");
+    document.getElementById("btnOpenModalNewTask").addEventListener("click", openModalTask);
+    document.getElementById("btnQuickAddTask").addEventListener("click", () => {
+      switchTab("viewTaches");
+      openModalTask();
+    });
+    document.getElementById("btnCloseModalTask").addEventListener("click", closeModalTask);
+    document.getElementById("btnCancelTask").addEventListener("click", closeModalTask);
+
+    document.getElementById("formAddTask").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const title = document.getElementById("taskInputTitle").value.trim();
+      const assignee = document.getElementById("taskInputAssignee").value;
+      const priority = document.getElementById("taskInputPriority").value;
+      const category = document.getElementById("taskInputCategory").value;
+      const date = document.getElementById("taskInputDate").value;
+
+      if (!title) return;
+
+      const newTask = {
+        id: Date.now(),
+        title,
+        assignee,
+        priority,
+        category,
+        date: date || new Date().toISOString().split("T")[0],
+        completed: false
+      };
+
+      AppState.tasks.unshift(newTask);
+      saveState();
+      renderAll();
+      closeModalTask();
+      document.getElementById("formAddTask").reset();
+      showToast("Nouvelle tâche partagée créée !", "✨");
+    });
+
+    // Modal Control: Purchases
+    const modalPurchase = document.getElementById("modalPurchase");
+    const openModalPurchase = () => modalPurchase.classList.remove("hidden");
+    const closeModalPurchase = () => modalPurchase.classList.add("hidden");
+    document.getElementById("btnOpenModalNewPurchase").addEventListener("click", openModalPurchase);
+    document.getElementById("btnQuickAddPurchase").addEventListener("click", () => {
+      switchTab("viewAchats");
+      openModalPurchase();
+    });
+    document.getElementById("btnCloseModalPurchase").addEventListener("click", closeModalPurchase);
+    document.getElementById("btnCancelPurchase").addEventListener("click", closeModalPurchase);
+
+    document.getElementById("formAddPurchase").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const title = document.getElementById("purchaseInputTitle").value.trim();
+      const price = Number(document.getElementById("purchaseInputPrice").value) || 0;
+      const assignee = document.getElementById("purchaseInputAssignee").value;
+      const category = document.getElementById("purchaseInputCategory").value;
+
+      if (!title) return;
+
+      const newPurchase = {
+        id: Date.now(),
+        title,
+        price,
+        assignee,
+        category,
+        completed: false
+      };
+
+      AppState.purchases.unshift(newPurchase);
+      saveState();
+      renderAll();
+      closeModalPurchase();
+      document.getElementById("formAddPurchase").reset();
+      showToast("Achat ajouté à la liste !", "🛒");
+    });
+
+    // Modal Control: Transactions
+    const modalTrans = document.getElementById("modalTransaction");
+    const openModalTrans = () => modalTrans.classList.remove("hidden");
+    const closeModalTrans = () => modalTrans.classList.add("hidden");
+    document.getElementById("btnOpenModalNewTransaction").addEventListener("click", openModalTrans);
+    document.getElementById("btnQuickAddExpense").addEventListener("click", () => {
+      switchTab("viewFinances");
+      openModalTrans();
+    });
+    document.getElementById("btnCloseModalTrans").addEventListener("click", closeModalTrans);
+    document.getElementById("btnCancelTrans").addEventListener("click", closeModalTrans);
+
+    document.getElementById("formAddTransaction").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const type = document.querySelector('input[name="transType"]:checked').value;
+      const title = document.getElementById("transInputTitle").value.trim();
+      const amount = Number(document.getElementById("transInputAmount").value) || 0;
+      const payer = document.getElementById("transInputPayer").value;
+      const category = document.getElementById("transInputCategory").value;
+
+      if (!title || !amount) return;
+
+      const newTrans = {
+        id: Date.now(),
+        title,
+        amount,
+        type,
+        payer,
+        category,
+        date: new Date().toISOString().split("T")[0]
+      };
+
+      AppState.transactions.unshift(newTrans);
+      saveState();
+      renderAll();
+      initExpensesChart();
+      closeModalTrans();
+      document.getElementById("formAddTransaction").reset();
+      showToast("Opération comptable enregistrée !", "💰");
+    });
+
+    // Modal Control: Child Needs (Quick prompt)
+    document.getElementById("btnOpenModalNewEnfantNeed").addEventListener("click", () => {
+      const child = AppState.currentUser && AppState.currentUser.role === "Maman" ? "Taline" : "Larine";
+      const newNeed = {
+        id: Date.now(),
+        child: child,
+        title: `Nouveau besoin ${child} (${new Date().toLocaleDateString('fr-FR')})`,
+        priority: "Moyenne",
+        completed: false
+      };
+      AppState.childrenNeeds.unshift(newNeed);
+      saveState();
+      renderChildrenNeeds();
+      showToast(`Besoin ajouté pour ${child}`, "🧸");
+    });
+
+
+    // Top bar Settings button & Quick Banners
+    document.getElementById("btnTopSettings").addEventListener("click", () => switchTab("viewParametres"));
+    document.getElementById("btnBannerGoSettings").addEventListener("click", () => switchTab("viewParametres"));
+    document.getElementById("btnGoSettingsFromEnfants").addEventListener("click", () => switchTab("viewParametres"));
+
+    // Theme swatches
+    document.querySelectorAll(".btn-theme-swatch").forEach(btn => {
+      btn.addEventListener("click", (e) => applyTheme(e.target.dataset.theme));
+    });
+
+    // Dark Mode button
+    document.getElementById("btnToggleDarkMode").addEventListener("click", toggleDarkMode);
+
+    // Reset Triggers
+    document.getElementById("btnTriggerResetPurchases").addEventListener("click", () => {
+      openResetConfirmation("purchases", "Réinitialiser les Achats", "Voulez-vous vraiment effacer tous les articles de la liste des courses ?");
+    });
+
+    document.getElementById("btnTriggerResetFinances").addEventListener("click", () => {
+      openResetConfirmation("finances", "Réinitialiser la Comptabilité", "Voulez-vous vraiment supprimer tout l'historique des entrées et dépenses ?");
+    });
+
+    document.getElementById("btnTriggerResetTasks").addEventListener("click", () => {
+      openResetConfirmation("tasks", "Réinitialiser les Tâches", "Voulez-vous vraiment effacer toutes les tâches de la maison ?");
+    });
+
+    document.getElementById("btnTriggerResetAll").addEventListener("click", () => {
+      openResetConfirmation("all", "Restauration Complète", "Voulez-vous restaurer toutes les données initiales de la maison ?");
+    });
+
+    document.getElementById("btnCancelResetAction").addEventListener("click", () => {
+      document.getElementById("modalConfirmReset").classList.add("hidden");
+      pendingResetAction = null;
+    });
+
+    document.getElementById("btnProceedResetAction").addEventListener("click", executeResetAction);
+
+    // Child Modal handlers
+    const modalChild = document.getElementById("modalChild");
+    const openChildModal = () => {
+      document.getElementById("formChild").reset();
+      document.getElementById("childEditId").value = "";
+      document.getElementById("modalChildTitle").textContent = "Ajouter un Enfant";
+      modalChild.classList.remove("hidden");
+    };
+    const closeChildModal = () => modalChild.classList.add("hidden");
+
+    document.getElementById("btnOpenAddChildModal").addEventListener("click", openChildModal);
+    document.getElementById("btnCloseModalChild").addEventListener("click", closeChildModal);
+    document.getElementById("btnCancelChild").addEventListener("click", closeChildModal);
+
+    // Auto calculate age when birthdate changes
+    document.getElementById("childInputBirthDate").addEventListener("change", (e) => {
+      const age = calculateAgeFromBirthDate(e.target.value);
+      document.getElementById("childInputAge").value = age;
+    });
+
+    // Form Child submit
+    document.getElementById("formChild").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const editId = document.getElementById("childEditId").value;
+      const name = document.getElementById("childInputName").value.trim();
+      const birthDate = document.getElementById("childInputBirthDate").value;
+      const age = Number(document.getElementById("childInputAge").value) || calculateAgeFromBirthDate(birthDate);
+      const shoeSize = document.getElementById("childInputShoe").value.trim();
+      const clothingSize = document.getElementById("childInputClothes").value.trim();
+      const schoolLevel = document.getElementById("childInputSchool").value.trim();
+
+      if (!name) return;
+
+      if (editId) {
+        // Edit existing
+        const child = AppState.children.find(c => c.id === Number(editId));
+        if (child) {
+          child.name = name;
+          child.birthDate = birthDate;
+          child.age = age;
+          child.shoeSize = shoeSize;
+          child.clothingSize = clothingSize;
+          child.schoolLevel = schoolLevel;
+          showToast(`Profil de ${name} mis à jour !`, "✨");
+        }
+      } else {
+        // Create new
+        const newChild = {
+          id: Date.now(),
+          name,
+          birthDate,
+          age,
+          shoeSize,
+          clothingSize,
+          schoolLevel
+        };
+        AppState.children.push(newChild);
+        showToast(`${name} a été ajouté(e) aux enfants !`, "👶");
+      }
+
+      saveState();
+      renderAll();
+      closeChildModal();
+    });
+
+    // Edit & Delete Child delegation
+    document.addEventListener("click", (e) => {
+      const btnEdit = e.target.closest(".btn-edit-child");
+      if (btnEdit) {
+        const id = Number(btnEdit.dataset.editChildId);
+        const child = AppState.children.find(c => c.id === id);
+        if (child) {
+          document.getElementById("childEditId").value = child.id;
+          document.getElementById("childInputName").value = child.name;
+          document.getElementById("childInputBirthDate").value = child.birthDate || "";
+          document.getElementById("childInputAge").value = child.age || "";
+          document.getElementById("childInputShoe").value = child.shoeSize || "";
+          document.getElementById("childInputClothes").value = child.clothingSize || "";
+          document.getElementById("childInputSchool").value = child.schoolLevel || "";
+          document.getElementById("modalChildTitle").textContent = `Modifier ${child.name}`;
+          modalChild.classList.remove("hidden");
+        }
+      }
+
+      const btnDel = e.target.closest(".btn-delete-child");
+      if (btnDel) {
+        const id = Number(btnDel.dataset.deleteChildId);
+        AppState.children = AppState.children.filter(c => c.id !== id);
+        saveState();
+        renderAll();
+        showToast("Enfant retiré", "🗑️");
+      }
+    });
+
+    // Initialization on page load (Strict: Requires email input on every launch)
+    loadState();
+    if (AppState.themeColor) applyTheme(AppState.themeColor);
+    if (AppState.darkMode) updateDarkModeUI();
+    
+    // Always lock on app launch - Require entering authorized email
+    AppState.currentUser = null;
+    authScreen.classList.remove("hidden");
+    appScreen.classList.add("hidden");
+    if (inputLoginEmail) {
+      inputLoginEmail.value = "";
+      setTimeout(() => inputLoginEmail.focus(), 300);
+    }
+  </script>
+</body>
+</html>
