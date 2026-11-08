@@ -1,29 +1,29 @@
-# Application Famille Étage (Package Android / PWA)
+# Application Famille Étage (Avec Synchronisation Cloud Firebase)
 
-Application familiale personnalisée pour le foyer :
+Cette version intègre la synchronisation en temps réel via **Google Firebase Firestore** :
 - **Papa** : Zineddine (`paralgan500@gmail.com`)
 - **Maman** : Alaa (`dr.bouhicha@gmail.com`)
-- **Enfants** :
-  - **Larine** (8 ans) - Primaire 3ème AP
-  - **Taline** (3 ans) - Maternelle / Crèche
-
-### Fonctionnalités intégrées :
-- **Connexion Google requise** pour sécuriser l'accès aux données.
-- **Tâches ménagères partagées** entre Zineddine et Alaa.
-- **Achats sous forme de tâches à faire** avec transfert automatique vers les dépenses du mois.
-- **Comptabilité de l'étage** : Entrées (salaires, revenus), Sorties (charges, loyer, courses, école), solde et graphique par poste.
-- **Besoins des Enfants** : suivi des pointures, vêtements, santé, école et activités pour Larine et Taline.
+- **Enfants** : Larine (8 ans) & Taline (3 ans)
 
 ---
 
-## Installation et création de l'APK Android
+## Comment activer la synchronisation en temps réel entre vos 2 téléphones ?
 
-### 1. Installation directe sur smartphone Android (PWA)
-1. Ouvrez `index.html` dans le navigateur Chrome de votre téléphone.
-2. Appuyez sur le menu (les 3 points en haut à droite) et choisissez **"Installer l'application"** (ou "Ajouter à l'écran d'accueil").
-3. L'application s'installe comme un APK natif, sans barre de navigation, avec icône sur l'écran d'accueil.
+1. Rendez-vous sur [console.firebase.google.com](https://console.firebase.google.com/) avec votre compte Google.
+2. Cliquez sur **Créer un projet** (ex. `famille-etage`).
+3. Dans le menu de gauche, cliquez sur **Firestore Database**, puis **Créer une base de données** (choisissez le mode test pour autoriser lecture et écriture).
+4. Allez dans **Paramètres du projet** (icône d'engrenage en haut à gauche) > **Général** > section **Vos applications**, puis cliquez sur l'icône Web `</>`.
+5. Donnez un nom et copiez l'objet `firebaseConfig` affiché, par exemple :
+   ```json
+   {
+     "apiKey": "AIzaSy...",
+     "authDomain": "famille-etage.firebaseapp.com",
+     "projectId": "famille-etage",
+     "storageBucket": "famille-etage.appspot.com",
+     "messagingSenderId": "...",
+     "appId": "..."
+   }
+   ```
+6. Ouvrez l'application, allez dans l'onglet **Paramètres**, collez ce texte dans la section **Synchronisation en Direct** et cliquez sur **Enregistrer & Activer Cloud**.
 
-### 2. Générer l'APK via PWABuilder (Gratuit)
-1. Allez sur [PWABuilder.com](https://www.pwabuilder.com/).
-2. Déposez les fichiers de l'application ou l'URL de votre hébergement gratuit (ex. GitHub Pages).
-3. Cliquez sur **"Package for Android"** pour télécharger le fichier `.apk` prêt à installer.
+Dès cet instant, chaque modification faite par Papa (tâche terminée, achat ajouté, dépense enregistrée) apparaît instantanément sur le téléphone de Maman et inversement, même après fermeture et réouverture !
